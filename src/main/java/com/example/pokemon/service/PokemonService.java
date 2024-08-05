@@ -2,6 +2,7 @@ package com.example.pokemon.service;
 
 import com.example.pokemon.model.RequestLog;
 import com.example.pokemon.repository.RequestLogRepository;
+import com.example.pokemon.soap.PokemonSoapRequest;
 import com.example.pokemon.soap.PokemonSoapResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -10,7 +11,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.LocalDateTime;
@@ -38,13 +43,13 @@ public class PokemonService {
         String response = restTemplate.getForObject(url, String.class);
         long duration = System.currentTimeMillis() - startTime;
 
-        // Parsear response y llenar PokemonSoapResponse
+        // Parse response and fill PokemonSoapResponse
         PokemonSoapResponse soapResponse = parseResponse(response);
 
-        // Convertir PokemonSoapResponse a JSON
+        // Convert PokemonSoapResponse to JSON
         String jsonResponse = convertToJson(soapResponse);
 
-        // Guardar detalles del request en la base de datos
+        // Save request details in the database
         RequestLog log = new RequestLog();
         log.setIp(getServerIp());
         log.setRequestDate(LocalDateTime.now());
@@ -109,5 +114,12 @@ public class PokemonService {
             e.printStackTrace();
         }
         return pokemonSoapResponse;
+    }
+
+    public PokemonSoapRequest unmarshalRequest(String xml) throws JAXBException {
+        JAXBContext context = JAXBContext.newInstance(PokemonSoapRequest.class, PokemonSoapResponse.class);
+        Unmarshaller unmarshaller = context.createUnmarshaller();
+        StringReader reader = new StringReader(xml);
+        return (PokemonSoapRequest) unmarshaller.unmarshal(reader);
     }
 }

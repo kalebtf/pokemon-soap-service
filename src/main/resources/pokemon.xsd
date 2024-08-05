@@ -13,12 +13,13 @@
 
     <xs:complexType name="PokemonSoapResponse">
         <xs:sequence>
-            <xs:element name="abilities" type="xs:string"/>
+            <xs:element name="abilities" type="xs:string" maxOccurs="unbounded"/>
             <xs:element name="baseExperience" type="xs:int"/>
-            <xs:element name="heldItems" type="xs:string"/>
+            <xs:element name="heldItems" type="xs:string" maxOccurs="unbounded"/>
             <xs:element name="id" type="xs:int"/>
             <xs:element name="name" type="xs:string"/>
-            <xs:element name="locationAreaEncounters" type="xs:string"/>
+            <xs:element name="locationAreaEncounters" type="xs:string" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
+
 </xs:schema>

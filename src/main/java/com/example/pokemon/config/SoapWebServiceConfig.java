@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.ws.config.annotation.EnableWs;
-import org.springframework.ws.config.annotation.WsConfigurerAdapter;
 import org.springframework.ws.transport.http.MessageDispatcherServlet;
 import org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition;
 import org.springframework.xml.xsd.SimpleXsdSchema;
@@ -14,28 +13,28 @@ import org.springframework.xml.xsd.XsdSchema;
 
 @EnableWs
 @Configuration
-public class SoapWebServiceConfig extends WsConfigurerAdapter {
+public class SoapWebServiceConfig {
 
     @Bean
-    public ServletRegistrationBean<MessageDispatcherServlet> messageDispatcherServlet(ApplicationContext context) {
+    public ServletRegistrationBean<MessageDispatcherServlet> messageDispatcherServlet(ApplicationContext applicationContext) {
         MessageDispatcherServlet servlet = new MessageDispatcherServlet();
-        servlet.setApplicationContext(context);
+        servlet.setApplicationContext(applicationContext);
         servlet.setTransformWsdlLocations(true);
         return new ServletRegistrationBean<>(servlet, "/ws/*");
+    }
+
+    @Bean(name = "pokemon")
+    public DefaultWsdl11Definition defaultWsdl11Definition(XsdSchema pokemonSchema) {
+        DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();
+        wsdl11Definition.setPortTypeName("PokemonPort");
+        wsdl11Definition.setLocationUri("/ws");
+        wsdl11Definition.setTargetNamespace("http://example.com/pokemon");
+        wsdl11Definition.setSchema(pokemonSchema);
+        return wsdl11Definition;
     }
 
     @Bean
     public XsdSchema pokemonSchema() {
         return new SimpleXsdSchema(new ClassPathResource("pokemon.xsd"));
-    }
-
-    @Bean(name = "pokemons")
-    public DefaultWsdl11Definition defaultWsdl11Definition(XsdSchema pokemonSchema) {
-        DefaultWsdl11Definition definition = new DefaultWsdl11Definition();
-        definition.setSchema(pokemonSchema);
-        definition.setLocationUri("/ws");
-        definition.setPortTypeName("PokemonPort");
-        definition.setTargetNamespace("http://example.com/pokemon");
-        return definition;
     }
 }

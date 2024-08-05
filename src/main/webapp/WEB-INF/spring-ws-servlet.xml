@@ -1,0 +1,23 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:sws="http://www.springframework.org/schema/web-services"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/web-services
+                           http://www.springframework.org/schema/web-services/web-services.xsd">
+
+    <sws:annotation-driven />
+
+    <bean id="messageFactory" class="org.springframework.ws.soap.saaj.SaajSoapMessageFactory" />
+
+    <bean id="messageDispatcher" class="org.springframework.ws.soap.server.SoapMessageDispatcher">
+        <property name="endpointMappings">
+            <bean class="org.springframework.ws.server.endpoint.mapping.PayloadRootAnnotationMethodEndpointMapping">
+                <property name="defaultEndpoint" ref="pokemonEndpoint" />
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="pokemonEndpoint" class="com.example.pokemon.soap.PokemonEndpoint" />
+
+</beans>
